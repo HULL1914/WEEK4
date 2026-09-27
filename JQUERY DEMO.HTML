@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<HEAD>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+
+
+
+
+    <script>
+        let clicked = 0;
+        $(document).ready(function() {
+
+           $(document).on("click", "p", function() {
+                $(this).hide();
+                clicked++;
+
+                if (clicked == 3) {
+                    $("#game").css('display', 'block');
+                }
+            })
+
+
+        })
+     </script>
+
+
+
+
+</HEAD>
+
+<BODY>
+
+    <p>If you Click me to hide me, I will disappear!</p>
+    <p>Click me again!</p>
+    <p>Click me too!</p>
+
+    <div id="game" style="display: none;
+    background-color:lightgrey; padding: 15px">
+        I saw you are losing some content on this page. I have a secret number between 1 and 20. If you guess it correctly in three attempts, I will bring them back.
+        <br/>
+        <br/>
+        <input type="number" id="guess-input">
+        <button id="guess-button">Guess!</button>
+        <button id="reset-button">Reset</button>
+        <div id="message-board">Make your guesses.</div>
+
+        <div>
+            <div>
+                <span>Attempts left</span>
+                <span id="attempts"></span>
+           </div>
+           <div>
+                <span>Wins</span>
+                <span id="wins"></span>
+            </div>
+            <div>
+                <span>Losses</span>
+                <span id="losses"></span>
+            </div>
+            <div>
+                <span>Games</span>
+                <span id="games"></span>
+            </div>
+    </div>
+
+
+
+
+</div>
+
+
+
+
+    <script>
+        $(document.body).append("<p>A new paragraph is here.</p>");
+    </script>
+
+    <script>
+        let paras = $("p");
+        $(document.body).append(`<p>This page has ${paras.length} paragraphs.</p>`);
+
+        $.each(paras, function(index, value) {
+            $(document.body).append(`<p>Paragraph # ${index}: ${value.innertext}</p>`);
+            console.log(value)
+
+        });
+
+        $("#demo").on("click", function() {
+            $(document.body).append(`<p>This page had ${paras.length} paragraphs.</p>`);
+            $.each(paras, function(index, value) {
+                $(document.body).append(`<p>Paragraph # ${index}: ${value.innertext}</p>`);
+                console.log(value)
+            });
+        })
+
+
+
+
+
+
+
+
+
+    </script>
+
+ <script>
+function random_number() {
+    return Math.floor(Math.random() * 20) + 1;
+}
+
+let max_attempts = 3;
+let message = $("#message-board");
+
+let game = {
+    secret: random_number(),
+    attempts: max_attempts,
+    wins: 0,
+    losses: 0,
+    games: 0,
+}
+
+$("#reset-button").prop("disabled", true);
+update_game(0, false);
+
+function update_game(num_tries, win) {
+    // num_tries - Number
+    // win - Boolean
+    if (win)
+        game.wins++;
+    else if (num_tries==max_attempts)
+        game.losses++;
+
+    if (num_tries==max_attempts || win) {
+        game.games++;
+        $("#guess-button").prop("disabled", true);
+        $("#reset-button").prop("disabled", false);
+}
+$("#attempts").html(game.attempts);
+$("#wins").html(game.wins);
+$("#losses").html(game.losses);
+$("#games").html(game.games);
+}
+
+function make_guess() {
+    let val = $("#guess-input").val();
+    if (!val)
+        return
+    $("#reset-button").prop("disabled", true);
+    let guess = Number(val);
+    game.attempts--;
+    let num_tries = max_attempts - game.attempts;
+    let win = false;
+    if (guess == game.secret) {
+        show_content();
+        message.html(`Correct! You took ${num_tries} tries.
+        Content is back. Click Reset to do again.`)
+        win = true;
+    } else if (num_tries==max_attempts) {
+        message.html("All attempts exhausted. Click on Reset to do again.")
+    } else {
+        if (guess < game.secret)
+            message.html("Too low! Try higher.")
+        else
+            message.html("Too high! Try lower.")
+    }
+
+    update_game(num_tries, win);
+
+}
+
+
+function show_content() {
+    $(document.body).append(`<p>This page has ${paras.length} paragraphs.</p>`);
+
+        $.each(paras, function(index, value) {
+            $(document.body).append(`<p>Paragraph # ${index}: ${value.innertext}</p>`);
+            console.log(value)
+
+        });
+
+
+    }
+
+$("#guess-button").on("click", make_guess);
+
+$("#reset-button").on("click", function() {
+    game.secret = random_number();
+    game.attempts = max_attempts;
+    message.html("Make your guesses again.");
+    $("#reset-button").prop("disabled", true);
+    $("#guess-button").prop("disabled", false);
+    update_game(0, false);
+
+
+})
+
+
+
+
+
+
+
+
+
+ </script>
+
+
+</body>
+
+
+
+
+
+
+
+
+
+
+
+</html>
