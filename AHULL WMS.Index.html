@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+
+<HEAD>
+     <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+</HEAD>
+
+<body>
+
+    <div id="map" style="height:512px; width:512px; border:1px solid grey; padding:5px;"></div>
+    <button id="button-left">&lt;</button>
+    <button id="button-right">&gt;</button>
+
+    <br/><br/>
+
+
+    <div id="controls">
+        <div id="date-row" style="display: flex; align-items: flex-start; gap: 10px;">
+            <label for="start-date">Start date:</label>
+            <input type="date" id="start-date" value="2026-01-01">
+
+            <label for="end-date">End date:</label>
+            <input type="date" id="end-date" value="2026-01-10">
+
+            <button id="apply-button">Apply</button>
+        </div>
+
+        <br/>
+
+        <div id="color-row">
+            <label for="color-picker">Color:</label>
+            <input type="color" id="color-picker" value="#ff1493">
+        </div>
+
+        <div id="controls-message"></div>
+    </div>
+
+<script>
+
+
+
+
+
+
+
+
+
+let date1 = $("#start-date").val();
+let date2 = $("#end-date").val();
+let color = hex_to_rgb($("#color-picker").val());
+
+let east = -60;
+let west = east + 100;
+
+let key = '31026835ac803fad21b9077c3250e9d0'
+
+update_map(east, west, date1, date2, color);
+
+
+
+
+
+
+
+
+
+
+function hex_to_rgb(hex) {
+    hex = hex.replace('#', '');
+    let r = parseInt(hex.substring(0, 2), 16);
+    let g = parseInt(hex.substring(2, 4), 16);
+    let b = parseInt(hex.substring(4, 6), 16);
+    return `${r}+${g}+${b}`;
+}
+
+function update_map(east, west, date1, date2, color) {
+
+   let src = `https://firms.modaps.eosdis.nasa.gov/mapserver/wms/fires/${key}/?REQUEST=GetMap&layers=fires_modis&COLORS=${color}&TIME=${date1}/${date2}&WIDTH=512&HEIGHT=512&BBOX=${east},-90,${west},90`;
+   console.log(src);
+   $('#map').html(`<img src="${src}">`);
+
+}
+
+
+
+
+$("#button-left").click(function() {
+    east -= 10;
+    west = east + 100;
+    update_map(east, west, date1, date2, color);
+    if (east <= -180) {
+        this.disabled = true;
+        if ($("#button-right").prop('disabled')) {
+            $("#button-right").prop('disabled', false);
+        }
+    }
+})
+
+$("#button-right").click(function() {
+    east += 10;
+    west = east + 100;
+    update_map(east, west, date1, date2, color);
+    if (east >= 0) {
+        this.disabled = true;
+        if ($("#button-left").prop('disabled')) {
+            $("#button-left").prop('disabled', false);
+        }
+    }
+})
+
+$("#apply-button").click(function() {
+    let new_date1 = $("#start-date").val();
+    let new_date2 = $("#end-date").val();
+    let new_color = hex_to_rgb($("#color-picker").val());
+
+    let d1 = new Date(new_date1);
+    let d2 = new Date(new_date2);
+    let diff_days = (d2 - d1) / (1000 * 60 * 60 * 24);
+
+    if (diff_days < 0) {
+        $("#controls-message").html("End date must be after start date.");
+        return;
+    }
+    if (diff_days > 30) {
+        $("#controls-message").html("Date range cannot be more than 30 days.");
+        return;
+    }
+
+   
+    date1 = new_date1;
+    date2 = new_date2;
+    color = new_color;
+
+    $("#controls-message").html("");
+    update_map(east, west, date1, date2, color);
+})
+
+</script>
+
+
+
+
+
+
+
+</BODY>
+
+</html>
